@@ -1,0 +1,46 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the Laravel IDE Helper plugin
+# Constants
+
+# Script
+echo ""
+echo "========================================================================"
+echo " Laravel IDE Helper environment updater"
+echo "========================================================================"
+
+## Update existing file
+echo ""
+echo "STEP 1. Update definitions"
+echo "------------------------------------------------------------------------"
+echo -n "Clearing compilations..."
+if php artisan clear-compiled > /dev/null 2>&1; then
+	echo "done"
+else
+	echo "failed"
+	echo "  Couldn't compile clearly the project"
+	echo "  Run the command manually for further details"
+	echo "  php artisan clear-compiled"
+	exit 1
+fi
+echo -n "Generating new documentation..."
+if php artisan ide-helper:generate > /dev/null 2>&1; then
+	echo "done"
+else
+	echo "failed"
+	echo "  Laravel IDE Helper could not update the project documentation"
+	echo "  Therefore the plugin will not be active"
+	echo "  Run the command manually for further details"
+	echo "  php artisan ide-helper:generate"
+	exit 1
+fi
+echo -n "Optimizing compilation..."
+if php artisan optimize > /dev/null 2>&1; then
+	echo "done"
+else
+	echo "failed"
+	echo "  Couldn't optimize the project"
+	echo "  Run the command manually for further details"
+	echo "  php artisan optimize"
+	exit 1
+fi
