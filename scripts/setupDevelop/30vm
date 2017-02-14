@@ -1,0 +1,50 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the virtual machine testing environment that will be necessary to develop
+# the project
+# Constants
+VAGRANT_CMD="vagrant"
+VAGRANT_URL="https://www.vagrantup.com/downloads.html"
+LARAVEL_HS_BOX="laravel/homestead"
+
+# Script
+echo ""
+echo "========================================================================"
+echo " Virtual Machine environment creator "
+echo "========================================================================"
+
+## Check vagrant exists
+echo ""
+echo "STEP 1. Vagrant software"
+echo "------------------------------------------------------------------------"
+echo -n "Checking vagrant exists..."
+if type $VAGRANT_CMD > /dev/null 2>&1; then
+	echo "exists"
+else
+	echo "does not exist"
+	echo "  Vagrant does not exist or is not acessible through shell"
+	echo "  Download and install it here:"
+	echo "  $VAGRANT_URL"
+	exit 1
+fi
+
+## Check vagrant box is installed
+echo ""
+echo "STEP 2. Vagrant Laravel Homestead Box"
+echo "------------------------------------------------------------------------"
+echo -n "Checking if Laravel Homemstead box is present..."
+if $VAGRANT_CMD box list 2> /dev/null | grep "$LARAVEL_HS_BOX" &> /dev/null
+then
+	echo "it's installed"
+else
+	echo "it's not installed"
+	echo "Installing it..."
+	if vagrant box add "$LARAVEL_HS_BOX"; then
+		echo "Box added succesfully"
+	else
+		echo "Unable to add box $LARAVEL_HS_BOX :S"
+		exit 1
+	fi
+fi
+
+## 3. Create Homestead file

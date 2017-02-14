@@ -1,0 +1,29 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the composer environment to work on the project
+# Constants
+COMPOSER_CMD="composer"
+COMPOSER_URL="https://getcomposer.org/download/"
+
+# Script
+echo ""
+echo "========================================================================"
+echo " Composer environment checker"
+echo "========================================================================"
+
+## Check composer exists
+echo ""
+echo "STEP 1. Composer software"
+echo "------------------------------------------------------------------------"
+echo -n "Checking if composer exists..."
+if type $COMPOSER_CMD > /dev/null 2>&1; then
+	echo "exists"
+else
+	echo "does not exist"
+	echo "  Composer does not exist or is not acessible through shell"
+	echo "  Download it and install it here:"
+	echo "  $COMPOSER_URL"
+	echo "  You can also try if you use APT"
+	echo "  sudo apt install composer"
+	exit 1
+fi

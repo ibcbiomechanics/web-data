@@ -1,0 +1,42 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the PHP interpreter environment to work on the project
+# Constants
+PHP_CMD="php"
+PHP_URL="https://secure.php.net/downloads.php"
+
+# Script
+echo ""
+echo "========================================================================"
+echo " PHP interpreter environment checker "
+echo "========================================================================"
+
+## Check PHP exists
+echo ""
+echo "STEP 1. PHP interpreter"
+echo "------------------------------------------------------------------------"
+echo -n "Checking PHP exists..."
+if type $PHP_CMD > /dev/null 2>&1; then
+	echo "exists"
+else
+	echo "does not exist"
+	echo "  PHP 7.0+ does not exist or is not acessible through shell"
+	echo "  Download it and install it here:"
+	echo "  $PHP_URL"
+	echo "  You can also try if you use APT"
+	echo "  sudo apt install php"
+	exit 1
+fi
+echo ""
+echo "STEP 2. PHP version check"
+echo "------------------------------------------------------------------------"
+echo -n "Checking the version is correct..."
+if $PHP_CMD -v 2> /dev/null | grep "PHP 7.0" &> /dev/null; then
+	echo "pass"
+else
+	echo "fail"
+	echo "Version required is 7.0+"
+	echo "Version found is:"
+	php -v
+	exit 1
+fi

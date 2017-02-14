@@ -1,0 +1,213 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the homestead environment to work on the project
+# Constants
+SSH_DIR="$HOME/.ssh"
+SSH_KEYNAME="id_ecdsa_vagrant_ibcwebdata"
+HOMESTEAD_CMD="php vendor/bin/homestead make"
+HOSTS_FILE="/etc/hosts"
+ENV_FILE=".env"
+ENV_DEF_APP_URL="APP_URL"
+ENV_CUS_APP_URL=""
+ENV_DEF_DB_PORT="DB_PORT"
+ENV_CUS_DB_PORT="33060"
+ENV_DEF_DB_NAME="DB_DATABASE"
+ENV_CUS_DB_NAME="ibcwebdata"
+HOMESTEAD_FILE="Homestead.yaml"
+HOMESTEAD_DEF_HOST="homestead.app"
+HOMESTEAD_CUS_HOST="ibcwebdata.app"
+HOMESTEAD_DEF_IP="192.168.10.10"
+HOMESTEAD_CUS_IP="192.168.168.192"
+HOMESTEAD_DEF_KEY="~/.ssh/id_rsa"
+HOMESTEAD_DEF_DB="    - homestead"
+HOMESTEAD_CUS_DB="    - ibcwebdata"
+HOMESTEAD_CUS_KEY="$SSH_DIR/$SSH_KEYNAME"
+
+# Functions
+## Change Homestead file
+## Receives two values and searches one to replace it by the other
+## Prints done or failed depending on the result and if fails, exits with error
+function change_homestead {
+	if sed -i "s/$1/$2/g" $HOMESTEAD_FILE &> /dev/null
+	then
+		echo "done"
+	else
+		echo "failed"
+		echo "  Customization of $HOMESTEAD_FILE file failed"
+		echo "  Try to type the command manually for more info"
+		echo "  sed -i "s/$1/$2/g" $HOMESTEAD_FILE"
+		exit 1
+	fi
+}
+## Change Environment
+## Receives two values and searches one to replace it by the other
+## Prints done or failed depending on the result and if fails, exits with error
+function change_env {
+	if sed -i "s/^\($1=\).*/\1$2/g" $ENV_FILE &> /dev/null
+	then
+		echo "done"
+	else
+		echo "failed"
+		echo "  Customization of $ENV_FILE file failed"
+		echo "  Try to type the command manually for more info"
+		echo "  sed -i 's/^\($1=\).*/\1$2/' $ENV_FILE"
+		exit 1
+	fi
+}
+
+# Script
+echo ""
+echo "========================================================================"
+echo " Homestead environment updater"
+echo "========================================================================"
+
+## Create homestead file
+echo ""
+echo "STEP 1. Homestead file creation"
+echo "------------------------------------------------------------------------"
+echo -n "Creating new Homestead file..."
+if $HOMESTEAD_CMD &> /dev/null; then
+	echo "done"
+else
+	echo "failed"
+	echo "  Creation of Homestead.yaml file failed"
+	echo "  Try to type the command manually for more info"
+	echo "  $HOMESTEAD_CMD"
+	exit 1
+fi
+
+## Create key pair
+echo ""
+echo "STEP 2. Key pair creation"
+echo "------------------------------------------------------------------------"
+keysExist=false
+echo -n "Checking for existing ECDSA key pairs..."
+if [ -f $HOMESTEAD_CUS_KEY ]; then
+	if [ -f $HOMESTEAD_CUS_KEY.pub ]; then
+		echo "already exist"
+		keysExist=true
+	else
+		echo "private key exist, public doesn't"
+		echo "  Please remove existing keys and restart the script"
+		echo "  You can do it using"
+		echo "  rm $HOMESTEAD_CUS_KEY $HOMESTEAD_CUS_KEY.pub"
+		echo "  Warning: make sure you don't use that keys"
+		exit 1
+	fi
+fi
+if [ $keysExist = false ]; then
+	echo -n "Creating new ECDSA key pairs..."
+	if ssh-keygen -f $HOMESTEAD_CUS_KEY -t ecdsa -N '' &> /dev/null; then
+		echo "done"
+	else
+		echo "failed"
+		echo "  Creation of ECDSA key pair failed"
+		echo "  Try to type the command manually for more info"
+		echo ssh-keygen -f $HOMESTEAD_CUS_KEY -t ecdsa -N ''
+		exit 1
+	fi
+fi
+
+## Customization of file
+echo ""
+echo "STEP 3. Homestead file customization"
+echo "------------------------------------------------------------------------"
+### Change key pair
+echo -n "Changing the key file to the key pair created..."
+change_homestead "${HOMESTEAD_DEF_KEY//\//\\/}" "${HOMESTEAD_CUS_KEY//\//\\/}"
+
+### Change IP
+echo -n "Changing the IP to a custom IP..."
+change_homestead "$HOMESTEAD_DEF_IP" "$HOMESTEAD_CUS_IP"
+
+### Change host
+echo -n "Changing the host to a custom host..."
+change_homestead "$HOMESTEAD_DEF_HOST" "$HOMESTEAD_CUS_HOST"
+
+### Change database
+echo -n "Changing the database to a name..."
+change_homestead "$HOMESTEAD_DEF_DB" "$HOMESTEAD_CUS_DB"
+
+## Hosts file
+echo ""
+echo "STEP 4. Hosts file customization"
+echo "------------------------------------------------------------------------"
+APP_URL=http://locahost:8000
+### Check if exists entry
+echo -n "Checking if entry in hosts file is present..."
+if cat $HOSTS_FILE | tr -d "\t\n\r " | grep $HOMESTEAD_CUS_IP > /dev/null; then
+	if cat $HOSTS_FILE | tr -d "\t\n\r " | \
+	grep $HOMESTEAD_CUS_IP$HOMESTEAD_CUS_HOST > /dev/null; then
+		echo "already set"
+		echo "  Your app will be visible at:"
+		APP_URL=http://$HOMESTEAD_CUS_HOST
+		echo "  $APP_URL"
+		
+	else
+		echo "misconfigured"
+		echo "  I can see there is the IP $HOMESTEAD_CUS_IP in hosts "\
+		"file $HOSTS_FILE, but is set to another value"
+		echo "  Please check (as admin) that in that file the "\
+		"following line is present:"
+		echo "  $HOMESTEAD_CUS_IP $HOMESTEAD_CUS_HOST"
+		exit 1
+	fi
+else
+	echo "missing"
+	echo "  I need to update $HOSTS_FILE, to add the following line"
+	echo "  $HOMESTEAD_CUS_IP $HOMESTEAD_CUS_HOST"
+	while true; do
+	    read -p "  Do you have admin privileges (I will have to sudo)?" yn
+	    case $yn in
+		[Yy]* ) installHosts=true; break;;
+		[Nn]* ) installHosts=false; break;;
+		* ) echo "  Please answer yes or no.";;
+	    esac
+	done
+	if $installHosts; then
+		echo -n "Adding entry to $HOSTS_FILE..."
+		if sudo sh -c \
+		"echo $HOMESTEAD_CUS_IP $HOMESTEAD_CUS_HOST >> $HOSTS_FILE"
+		then
+			echo "done"
+			echo "  Your app will be visible at:"
+			APP_URL=http://$HOMESTEAD_CUS_HOST
+			echo "  $APP_URL"
+		else
+			echo "failed"
+			echo "Unable to add host to $HOSTS_FILE"
+			echo "Execute the following command manually"
+			echo "sudo sh -c \"echo $HOMESTEAD_CUS_IP "\
+			"$HOMESTEAD_CUS_HOST >> $HOSTS_FILE\""
+			exit 1
+		fi
+	else
+			echo "  If no extra configuration applied, then "\
+			"your app will be visible at:"
+			echo "  $APP_URL"
+	fi
+fi
+
+## Create environment
+echo ""
+echo "STEP 4. Environment file customization"
+echo "------------------------------------------------------------------------"
+echo -n "Checking for environment file..."
+if [ -f $ENV_FILE ]; then
+	echo "pass"
+else
+	echo "fail"
+	echo "No $ENV_FILE found. Please create it using"
+	echo "composer update"
+	echo "And run again the script"
+fi
+### App url
+echo -n "Changing environment app URL..."
+ENV_CUS_APP_URL="$APP_URL"
+change_env $ENV_DEF_APP_URL ${ENV_CUS_APP_URL//\//\\/}
+### Database connection
+echo -n "Changing database port..."
+change_env $ENV_DEF_DB_PORT $ENV_CUS_DB_PORT
+### Database name
+echo -n "Changing database name..."
+change_env $ENV_DEF_DB_NAME $ENV_CUS_DB_NAME

@@ -1,0 +1,40 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the composer environment to work on the project
+# Constants
+COMPOSER_CMD="composer"
+COMPOSER_FILE="composer.json"
+
+# Script
+echo ""
+echo "========================================================================"
+echo " Composer environment updater"
+echo "========================================================================"
+
+## Check composer dependencies exist
+echo ""
+echo "STEP 1. Check composer dependencies"
+echo "------------------------------------------------------------------------"
+echo -n "Checking dependencies exists..."
+if [ -f $COMPOSER_FILE ]; then
+	echo "exists"
+else
+	echo "do not exist"
+	echo "  I can't see any $COMPOSER_FILE here"
+	echo "  Are you running the script from the project root?"
+	exit 1
+fi
+## Check composer dependencies are updated
+echo ""
+echo "STEP 2. Update composer dependencies"
+echo "------------------------------------------------------------------------"
+echo -n "Updating dependencies..."
+if $COMPOSER_CMD update > /dev/null 2>&1; then
+	echo "updated"
+else
+	echo "Unable to update dependencies"
+	echo "Ensure you have got internet access and try again"
+	echo "Otherwise, try a manual update with the following command"
+	$COMPOSER_CMD update
+	exit 1
+fi
