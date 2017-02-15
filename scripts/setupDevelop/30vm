@@ -46,5 +46,3 @@ else
 		exit 1
 	fi
 fi
-
-## 3. Create Homestead file

@@ -1,0 +1,34 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the vagrant required plugins in order for vagrant file to work
+# the project
+# Constants
+VAGRANT_CMD="vagrant"
+VAGRANT_PLG_HOST_SHELL="vagrant-host-shell"
+
+# Script
+echo ""
+echo "========================================================================"
+echo " Vagrant plugin installer "
+echo "========================================================================"
+
+## Check plugin vagrant-host-shell
+echo ""
+echo "STEP 2. Vagrant Host Shell Plugin"
+echo "------------------------------------------------------------------------"
+echo -n "Checking $VAGRANT_PLG_HOST_SHELL plugin..."
+if $VAGRANT_CMD plugin list 2> /dev/null | grep "$VAGRANT_PLG_HOST_SHELL" &> /dev/null
+then
+	echo "it's installed"
+else
+	echo "it's not installed"
+	echo " Installing it..."
+	if $VAGRANT_CMD plugin install "$VAGRANT_PLG_HOST_SHELL" &> /dev/null; then
+		echo " Plugin added succesfully"
+	else
+		echo " Unable to add plugin $VAGRANT_PLG_HOST_SHELL :S"
+		echo " Run command manually to see errors"
+		echo $VAGRANT_CMD plugin install "$VAGRANT_PLG_HOST_SHELL"
+		exit 1
+	fi
+fi
