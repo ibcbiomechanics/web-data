@@ -177,6 +177,12 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        /*
+         * Externals
+         */
+        // Vinkla/HashIDs
+        Vinkla\Hashids\HashidsServiceProvider::class,
+
     ],
 
     /*
@@ -208,6 +214,7 @@ return [
         'File' => Illuminate\Support\Facades\File::class,
         'Gate' => Illuminate\Support\Facades\Gate::class,
         'Hash' => Illuminate\Support\Facades\Hash::class,
+        'Hashids' => Vinkla\Hashids\Facades\Hashids::class,
         'Lang' => Illuminate\Support\Facades\Lang::class,
         'Log' => Illuminate\Support\Facades\Log::class,
         'Mail' => Illuminate\Support\Facades\Mail::class,
