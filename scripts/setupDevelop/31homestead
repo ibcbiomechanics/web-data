@@ -6,13 +6,6 @@ SSH_DIR="$HOME/.ssh"
 SSH_KEYNAME="id_ecdsa_vagrant_ibcwebdata"
 HOMESTEAD_CMD="php vendor/bin/homestead make"
 HOSTS_FILE="/etc/hosts"
-ENV_FILE=".env"
-ENV_DEF_APP_URL="APP_URL"
-ENV_CUS_APP_URL=""
-ENV_DEF_DB_PORT="DB_PORT"
-ENV_CUS_DB_PORT="33060"
-ENV_DEF_DB_NAME="DB_DATABASE"
-ENV_CUS_DB_NAME="ibcwebdata"
 HOMESTEAD_FILE="Homestead.yaml"
 HOMESTEAD_DEF_HOST="homestead.app"
 HOMESTEAD_CUS_HOST="ibcwebdata.app"
@@ -22,6 +15,16 @@ HOMESTEAD_DEF_KEY="~/.ssh/id_rsa"
 HOMESTEAD_DEF_DB="    - homestead"
 HOMESTEAD_CUS_DB="    - ibcwebdata"
 HOMESTEAD_CUS_KEY="$SSH_DIR/$SSH_KEYNAME"
+ENV_FILE=".env"
+ENV_DEF_APP_URL="APP_URL"
+ENV_CUS_APP_URL=""
+ENV_DEF_DB_PORT="DB_PORT"
+ENV_CUS_DB_PORT="3306"
+ENV_DEF_DB_NAME="DB_DATABASE"
+ENV_CUS_DB_NAME="ibcwebdata"
+ENV_DEF_DB_HOST="DB_HOST"
+ENV_CUS_DB_HOST="$HOMESTEAD_CUS_IP"
+
 
 # Functions
 ## Change Homestead file
@@ -205,9 +208,12 @@ fi
 echo -n "Changing environment app URL..."
 ENV_CUS_APP_URL="$APP_URL"
 change_env $ENV_DEF_APP_URL ${ENV_CUS_APP_URL//\//\\/}
-### Database connection
+### Database port
 echo -n "Changing database port..."
 change_env $ENV_DEF_DB_PORT $ENV_CUS_DB_PORT
+### Database host
+echo -n "Changing database host..."
+change_env $ENV_DEF_DB_HOST $ENV_CUS_DB_HOST
 ### Database name
 echo -n "Changing database name..."
 change_env $ENV_DEF_DB_NAME $ENV_CUS_DB_NAME
