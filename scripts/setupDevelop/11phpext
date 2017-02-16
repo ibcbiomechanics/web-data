@@ -1,0 +1,60 @@
+#!/bin/bash
+# This script is intended to help newly developers of the project to setup
+# the PHP interpreter environment with the required extensions
+# Constants
+PHP_CMD="php"
+PHP_EXT_MBSTRING="mbstring"
+PHP_EXT_BCMATH="bcmath"
+PHP_EXT_DOM="dom"
+
+# Script
+echo ""
+echo "========================================================================"
+echo " PHP interpreter extension checker "
+echo "========================================================================"
+
+## MBstring
+echo ""
+echo "STEP 1. PHP ext-$PHP_EXT_MBSTRING"
+echo "------------------------------------------------------------------------"
+echo -n "Checking PHP extension $PHP_EXT_MBSTRING exists..."
+if $PHP_CMD --ini 2> /dev/null | grep $PHP_EXT_MBSTRING &> /dev/null; then
+	echo "exists"
+else
+	echo "does not exist"
+	echo "  PHP extension $PHP_EXT_MBSTRING does not exist, look for it and "\
+	"install it"
+	echo "  You can also try if you use APT"
+	echo "  sudo apt install php-$PHP_EXT_MBSTRING"
+	exit 1
+fi
+## BCmath
+echo ""
+echo "STEP 2. PHP ext-$PHP_EXT_BCMATH"
+echo "------------------------------------------------------------------------"
+echo -n "Checking PHP extension $PHP_EXT_BCMATH exists..."
+if $PHP_CMD --ini 2> /dev/null | grep $PHP_EXT_BCMATH &> /dev/null; then
+	echo "exists"
+else
+	echo "does not exist"
+	echo "  PHP extension $PHP_EXT_BCMATH does not exist, look for it and "\
+	"install it"
+	echo "  You can also try if you use APT"
+	echo "  sudo apt install php-$PHP_EXT_BCMATH"
+	exit 1
+fi
+## Dom
+echo ""
+echo "STEP 2. PHP ext-$PHP_EXT_DOM"
+echo "------------------------------------------------------------------------"
+echo -n "Checking PHP extension $PHP_EXT_DOM exists..."
+if $PHP_CMD --ini 2> /dev/null | grep $PHP_EXT_DOM &> /dev/null; then
+	echo "exists"
+else
+	echo "does not exist"
+	echo "  PHP extension $PHP_EXT_DOM does not exist, look for it and "\
+	"install it"
+	echo "  You can also try if you use APT"
+	echo "  sudo apt install php-$PHP_EXT_DOM"
+	exit 1
+fi

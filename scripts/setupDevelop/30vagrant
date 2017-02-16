@@ -27,22 +27,3 @@ else
 	echo "  $VAGRANT_URL"
 	exit 1
 fi
-
-## Check vagrant box is installed
-echo ""
-echo "STEP 2. Vagrant Laravel Homestead Box"
-echo "------------------------------------------------------------------------"
-echo -n "Checking if Laravel Homemstead box is present..."
-if $VAGRANT_CMD box list 2> /dev/null | grep "$LARAVEL_HS_BOX" &> /dev/null
-then
-	echo "it's installed"
-else
-	echo "it's not installed"
-	echo "Installing it..."
-	if vagrant box add "$LARAVEL_HS_BOX"; then
-		echo "Box added succesfully"
-	else
-		echo "Unable to add box $LARAVEL_HS_BOX :S"
-		exit 1
-	fi
-fi
